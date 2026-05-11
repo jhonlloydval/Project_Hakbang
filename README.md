@@ -41,9 +41,8 @@
 
 ## Pitch Deck
 
-TBA
 ---
-
+TBA
 ## Background & Significance
 
 <div align="center">
