@@ -41,8 +41,7 @@
 
 ## Pitch Deck
 
-[View Hakbang Pitch Deck (PDF)](assets/ppt/HAKBANG_PitchDeck.pdf)
-
+TBA
 ---
 
 ## Background & Significance
