@@ -20,28 +20,24 @@
 
 ## Table of Contents
 
-1. [Pitch Deck](#pitch-deck)
-2. [Background & Significance](#background--significance)
-3. [What is Hakbang?](#what-is-hakbang)
-4. [Target Users](#target-users)
-5. [Core Features](#core-features)
-6. [App Flow & Architecture](#app-flow--architecture)
-7. [Tech Stack](#tech-stack)
-8. [Dependencies](#dependencies)
-9. [State Management](#state-management)
-10. [Data Models](#data-models)
-11. [Backend & API](#backend--api)
-12. [Project Structure](#project-structure)
-13. [Design System](#design-system)
-14. [Getting Started](#getting-started)
-15. [Environment Setup](#environment-setup)
-16. [Roadmap](#roadmap)
+1. [Background & Significance](#background--significance)
+2. [What is Hakbang?](#what-is-hakbang)
+3. [Target Users](#target-users)
+4. [Core Features](#core-features)
+5. [App Flow & Architecture](#app-flow--architecture)
+6. [Tech Stack](#tech-stack)
+7. [Dependencies](#dependencies)
+8. [State Management](#state-management)
+9. [Data Models](#data-models)
+10. [Backend & API](#backend--api)
+11. [Project Structure](#project-structure)
+12. [Design System](#design-system)
+13. [Getting Started](#getting-started)
+14. [Environment Setup](#environment-setup)
+15. [Roadmap](#roadmap)
 
 ---
 
-## Pitch Deck
-TBA
----
 ## Background & Significance
 
 <div align="center">
