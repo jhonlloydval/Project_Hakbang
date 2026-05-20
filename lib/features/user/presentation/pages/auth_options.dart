@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hakbang/features/user/presentation/design/app_colors.dart';
 import 'package:hakbang/features/user/presentation/design/button_design.dart';
 import 'package:hakbang/features/user/presentation/design/font_styles.dart';
+import 'package:hakbang/features/user/presentation/design/input_design.dart';
 import 'package:hakbang/features/user/presentation/pages/signup_page.dart';
 import 'package:hakbang/functions/verifications.dart';
 
@@ -15,6 +16,9 @@ class AuthOptions extends StatefulWidget {
 }
 
 class _AuthOptionsState extends State<AuthOptions> {
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  ValueNotifier<bool> isVisible = ValueNotifier(false);
   Widget _buildGoogleSignInButton() {
     return SizedBox(
       height: 50,
@@ -120,7 +124,7 @@ class _AuthOptionsState extends State<AuthOptions> {
           ),
         ),
         Text(
-          "SIGN UP",
+          "OR SIGN UP WITH",
           style: GoogleFonts.dmSans(color: AppColors.textPrimary),
         ),
         Expanded(
@@ -133,6 +137,39 @@ class _AuthOptionsState extends State<AuthOptions> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required String hintText,
+    Widget? prefixIcon,
+    Widget? suffixIcon,
+    bool obscureText = false,
+  }) {
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      cursorColor: AppColors.accent,
+      decoration: InputDecoration(
+        hintText: hintText,
+        prefixIcon: Align(widthFactor: 1, heightFactor: 1, child: prefixIcon),
+        suffixIcon: suffixIcon,
+        hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 14),
+        filled: true,
+        fillColor: AppColors.surface2,
+        contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 13),
+        border: InputDesign.borderInput(color: AppColors.border2, width: 1.5),
+        enabledBorder: InputDesign.borderInput(
+          color: AppColors.border2,
+          width: 1.5,
+        ),
+        focusedBorder: InputDesign.borderInput(
+          color: AppColors.accent,
+          width: 1.5,
+        ),
+      ),
+      style: FontStyles.inputText,
     );
   }
 
@@ -163,6 +200,38 @@ class _AuthOptionsState extends State<AuthOptions> {
               _buildLogo(),
               const SizedBox(height: 5),
               _buildTitle(),
+              const SizedBox(height: 20),
+              _buildInputField(
+                controller: emailController,
+                hintText: "Input Email here",
+                prefixIcon: FaIcon(
+                  FontAwesomeIcons.google,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 10),
+              ValueListenableBuilder(
+                valueListenable: isVisible,
+                builder: (context, visible, child) {
+                  return _buildInputField(
+                    controller: passwordController,
+                    hintText: "Input password",
+                    prefixIcon: FaIcon(
+                      FontAwesomeIcons.lock,
+                      color: Colors.white,
+                    ),
+                    obscureText: !visible,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        visible ? Icons.visibility : Icons.visibility_off,
+                        color: Color(0xFF828a8a),
+                        size: 20,
+                      ),
+                      onPressed: () => isVisible.value = !isVisible.value,
+                    ),
+                  );
+                },
+              ),
               const SizedBox(height: 20),
               _buildSeparators(),
               const SizedBox(height: 10),
