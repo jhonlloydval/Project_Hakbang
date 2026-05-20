@@ -11,7 +11,6 @@ import 'package:hakbang/features/user/data/models/user.dart';
 import 'package:hakbang/notifiers.dart';
 import 'package:hakbang/features/user/presentation/pages/main_page.dart';
 import 'package:hakbang/features/user/presentation/pages/no_internet_page.dart';
-import 'package:hakbang/features/user/presentation/pages/signup_page.dart';
 import 'package:hakbang/features/user/presentation/widgets/auth_gradient_bg.dart';
 
 class LoginPage extends StatefulWidget {

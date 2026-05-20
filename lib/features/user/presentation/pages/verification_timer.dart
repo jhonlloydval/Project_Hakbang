@@ -78,90 +78,93 @@ class _VerificationTimerState extends State<VerificationTimer> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      appBar: AppBar(
-        title: Text(
-          "Verify Account",
-          style: GoogleFonts.dmSans(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-            fontSize: 20,
-          ),
-        ),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
         backgroundColor: AppColors.bg,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.chevron_left,
-            color: AppColors.textPrimary,
-            size: 28,
+        appBar: AppBar(
+          title: Text(
+            "Verify Account",
+            style: GoogleFonts.dmSans(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              fontSize: 20,
+            ),
           ),
-          onPressed: () => Navigator.pop(context),
+          backgroundColor: AppColors.bg,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.chevron_left,
+              color: AppColors.textPrimary,
+              size: 28,
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                "To verify your account, please check the verification code sent to your account: ${widget.email} ",
-                style: GoogleFonts.dmSans(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  "To verify your account, please check the verification code sent to your account: ${widget.email} ",
+                  style: GoogleFonts.dmSans(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 30),
-              _buildCodeField(),
-              const SizedBox(height: 20),
-              ValueListenableBuilder(
-                valueListenable: countTime,
-                builder: (context, count, child) {
-                  return ValueListenableBuilder(
-                    valueListenable: endTime,
-                    builder: (context, end, child) {
-                      return CountdownTimer(
-                        controller: count,
-                        endTime: end,
-                        widgetBuilder: (context, time) {
-                          if (time == null) {
-                            return TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  endTime.value =
-                                      DateTime.now().millisecondsSinceEpoch +
-                                      1000 * 60;
-                                  countTime.value = CountdownTimerController(
-                                    endTime: endTime.value,
-                                  );
-                                });
-                              },
-                              child: Text(
-                                "Resend Code?",
-                                style: GoogleFonts.dmSans(
-                                  color: AppColors.blue,
-                                  fontWeight: FontWeight.w700,
+                const SizedBox(height: 30),
+                _buildCodeField(),
+                const SizedBox(height: 20),
+                ValueListenableBuilder(
+                  valueListenable: countTime,
+                  builder: (context, count, child) {
+                    return ValueListenableBuilder(
+                      valueListenable: endTime,
+                      builder: (context, end, child) {
+                        return CountdownTimer(
+                          controller: count,
+                          endTime: end,
+                          widgetBuilder: (context, time) {
+                            if (time == null) {
+                              return TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    endTime.value =
+                                        DateTime.now().millisecondsSinceEpoch +
+                                        1000 * 60;
+                                    countTime.value = CountdownTimerController(
+                                      endTime: endTime.value,
+                                    );
+                                  });
+                                },
+                                child: Text(
+                                  "Resend Code?",
+                                  style: GoogleFonts.dmSans(
+                                    color: AppColors.blue,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
+                              );
+                            }
+                            return Text(
+                              ' Resend Verification Email in 00:${time.sec! > 9 ? time.sec : "0${time.sec}"}',
+                              style: GoogleFonts.dmSans(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
                               ),
                             );
-                          }
-                          return Text(
-                            ' Resend Verification Email in 00:${time.sec! > 9 ? time.sec : "0${time.sec}"}',
-                            style: GoogleFonts.dmSans(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  );
-                },
-              ),
-            ],
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
