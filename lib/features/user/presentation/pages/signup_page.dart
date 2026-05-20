@@ -20,7 +20,7 @@ import 'package:hakbang/features/user/presentation/widgets/signup_progress_indic
 import 'package:hakbang/features/user/presentation/widgets/auth_gradient_bg.dart';
 
 class SignupPage extends StatefulWidget {
-  final String authFullname;
+  final String? authFullname;
   final String authemail;
   const SignupPage({
     super.key,

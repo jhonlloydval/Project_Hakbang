@@ -2,12 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/countdown_timer_controller.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hakbang/features/user/data/user_repo.dart';
 import 'package:hakbang/features/user/presentation/design/app_colors.dart';
+import 'package:hakbang/features/user/presentation/pages/signup_page.dart';
 import 'package:verification_code_field/verification_code_field.dart';
 
 class VerificationTimer extends StatefulWidget {
   final String email;
-  const VerificationTimer({super.key, required this.email});
+  final String token;
+  const VerificationTimer({
+    super.key,
+    required this.email,
+    required this.token,
+  });
 
   @override
   State<VerificationTimer> createState() => _VerificationTimerState();
@@ -28,6 +35,31 @@ class _VerificationTimerState extends State<VerificationTimer> {
       filled: true,
       fillColor: AppColors.surface2,
       fieldSize: 40,
+      onSubmit: (value) async {
+        try {
+          var data = await UserRepo.verifyCode(widget.token, value);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text(data["message"]),
+            ),
+          );
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  SignupPage(authFullname: null, authemail: widget.email),
+            ),
+          );
+        } catch (error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text(error.toString()),
+            ),
+          );
+        }
+      },
       textStyle: TextStyle(
         color: Colors.white,
         fontSize: 25,

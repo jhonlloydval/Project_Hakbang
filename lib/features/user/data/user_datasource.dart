@@ -14,6 +14,28 @@ class UserDatasource {
     }
   }
 
+  static Future<Map<String, dynamic>> requestCodeRouter(String email) async {
+    try {
+      final response = await dio.post("$mainUrl/user/auth-user-email/$email");
+      return response.data;
+    } on DioException catch (error) {
+      throw error.response?.data["message"];
+    }
+  }
+
+  static Future<Map<String, dynamic>> verifyCodeRouter(
+    String token,
+    String code,
+  ) async {
+    try {
+      final data = {"token": token, "code": code};
+      final response = await dio.post("$mainUrl/user/verify", data: data);
+      return response.data;
+    } on DioException catch (error) {
+      throw error.response?.data["message"];
+    }
+  }
+
   static Future<Map<String, dynamic>> userLoginRouter(
     String email,
     String password,

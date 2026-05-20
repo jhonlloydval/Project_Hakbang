@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hakbang/features/user/data/user_repo.dart';
 import 'package:hakbang/features/user/presentation/design/app_colors.dart';
 import 'package:hakbang/features/user/presentation/design/button_design.dart';
 import 'package:hakbang/features/user/presentation/design/font_styles.dart';
@@ -18,7 +19,6 @@ class AuthOptions extends StatefulWidget {
 
 class _AuthOptionsState extends State<AuthOptions> {
   TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
   ValueNotifier<bool> isVisible = ValueNotifier(false);
   Widget _buildGoogleSignInButton() {
     return SizedBox(
@@ -71,14 +71,26 @@ class _AuthOptionsState extends State<AuthOptions> {
       height: 50,
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  VerificationTimer(email: emailController.text),
-            ),
-          );
+        onPressed: () async {
+          try {
+            var data = await UserRepo.requestCode(emailController.text);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => VerificationTimer(
+                  email: emailController.text,
+                  token: data["token"],
+                ),
+              ),
+            );
+          } catch (error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text(error.toString()),
+              ),
+            );
+          }
         },
         style: ButtonDesign.signUpButton,
         child: Text('SIGN UP', style: FontStyles.signupContinueButton),
@@ -165,17 +177,13 @@ class _AuthOptionsState extends State<AuthOptions> {
     required TextEditingController controller,
     required String hintText,
     Widget? prefixIcon,
-    Widget? suffixIcon,
-    bool obscureText = false,
   }) {
     return TextField(
       controller: controller,
-      obscureText: obscureText,
       cursorColor: AppColors.accent,
       decoration: InputDecoration(
         hintText: hintText,
         prefixIcon: Align(widthFactor: 1, heightFactor: 1, child: prefixIcon),
-        suffixIcon: suffixIcon,
         hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 14),
         filled: true,
         fillColor: AppColors.surface2,
@@ -230,29 +238,6 @@ class _AuthOptionsState extends State<AuthOptions> {
                     FontAwesomeIcons.google,
                     color: Colors.white,
                   ),
-                ),
-                const SizedBox(height: 10),
-                ValueListenableBuilder(
-                  valueListenable: isVisible,
-                  builder: (context, visible, child) {
-                    return _buildInputField(
-                      controller: passwordController,
-                      hintText: "Input password",
-                      prefixIcon: FaIcon(
-                        FontAwesomeIcons.lock,
-                        color: Colors.white,
-                      ),
-                      obscureText: !visible,
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          visible ? Icons.visibility : Icons.visibility_off,
-                          color: Color(0xFF828a8a),
-                          size: 20,
-                        ),
-                        onPressed: () => isVisible.value = !isVisible.value,
-                      ),
-                    );
-                  },
                 ),
                 const SizedBox(height: 20),
                 _buildContinueButton(),
