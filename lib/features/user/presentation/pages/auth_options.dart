@@ -6,6 +6,7 @@ import 'package:hakbang/features/user/presentation/design/button_design.dart';
 import 'package:hakbang/features/user/presentation/design/font_styles.dart';
 import 'package:hakbang/features/user/presentation/design/input_design.dart';
 import 'package:hakbang/features/user/presentation/pages/signup_page.dart';
+import 'package:hakbang/features/user/presentation/pages/verification_timer.dart';
 import 'package:hakbang/functions/verifications.dart';
 
 class AuthOptions extends StatefulWidget {
@@ -61,6 +62,26 @@ class _AuthOptionsState extends State<AuthOptions> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildContinueButton() {
+    return SizedBox(
+      height: 50,
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  VerificationTimer(email: emailController.text),
+            ),
+          );
+        },
+        style: ButtonDesign.signUpButton,
+        child: Text('SIGN UP', style: FontStyles.signupContinueButton),
       ),
     );
   }
@@ -190,53 +211,57 @@ class _AuthOptionsState extends State<AuthOptions> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildLogo(),
-              const SizedBox(height: 5),
-              _buildTitle(),
-              const SizedBox(height: 20),
-              _buildInputField(
-                controller: emailController,
-                hintText: "Input Email here",
-                prefixIcon: FaIcon(
-                  FontAwesomeIcons.google,
-                  color: Colors.white,
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildLogo(),
+                const SizedBox(height: 5),
+                _buildTitle(),
+                const SizedBox(height: 20),
+                _buildInputField(
+                  controller: emailController,
+                  hintText: "Input Email here",
+                  prefixIcon: FaIcon(
+                    FontAwesomeIcons.google,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              ValueListenableBuilder(
-                valueListenable: isVisible,
-                builder: (context, visible, child) {
-                  return _buildInputField(
-                    controller: passwordController,
-                    hintText: "Input password",
-                    prefixIcon: FaIcon(
-                      FontAwesomeIcons.lock,
-                      color: Colors.white,
-                    ),
-                    obscureText: !visible,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        visible ? Icons.visibility : Icons.visibility_off,
-                        color: Color(0xFF828a8a),
-                        size: 20,
+                const SizedBox(height: 10),
+                ValueListenableBuilder(
+                  valueListenable: isVisible,
+                  builder: (context, visible, child) {
+                    return _buildInputField(
+                      controller: passwordController,
+                      hintText: "Input password",
+                      prefixIcon: FaIcon(
+                        FontAwesomeIcons.lock,
+                        color: Colors.white,
                       ),
-                      onPressed: () => isVisible.value = !isVisible.value,
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 20),
-              _buildSeparators(),
-              const SizedBox(height: 10),
-              _buildGoogleSignInButton(),
-            ],
+                      obscureText: !visible,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          visible ? Icons.visibility : Icons.visibility_off,
+                          color: Color(0xFF828a8a),
+                          size: 20,
+                        ),
+                        onPressed: () => isVisible.value = !isVisible.value,
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+                _buildContinueButton(),
+                const SizedBox(height: 20),
+                _buildSeparators(),
+                const SizedBox(height: 10),
+                _buildGoogleSignInButton(),
+              ],
+            ),
           ),
         ),
       ),
