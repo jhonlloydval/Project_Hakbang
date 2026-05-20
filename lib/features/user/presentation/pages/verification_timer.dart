@@ -8,12 +8,14 @@ import 'package:hakbang/features/user/presentation/pages/signup_page.dart';
 import 'package:pinput/pinput.dart';
 
 class VerificationTimer extends StatefulWidget {
+  final String? fullname;
   final String email;
   final String token;
   const VerificationTimer({
     super.key,
     required this.email,
     required this.token,
+    this.fullname,
   });
 
   @override
@@ -71,8 +73,11 @@ class _VerificationTimerState extends State<VerificationTimer> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  SignupPage(authFullname: null, authemail: widget.email),
+              builder: (context) => SignupPage(
+                authFullname: widget.fullname,
+                authemail: widget.email,
+                token: token,
+              ),
             ),
           );
         } catch (error) {

@@ -20,12 +20,14 @@ import 'package:hakbang/features/user/presentation/widgets/signup_progress_indic
 import 'package:hakbang/features/user/presentation/widgets/auth_gradient_bg.dart';
 
 class SignupPage extends StatefulWidget {
+  final String token;
   final String? authFullname;
   final String authemail;
   const SignupPage({
     super.key,
     required this.authFullname,
     required this.authemail,
+    required this.token,
   });
 
   @override
@@ -191,7 +193,7 @@ class _SignupPageState extends State<SignupPage> {
       };
       //TODO: Google Sign In
       try {
-        await UserRepo.signupUser(data);
+        await UserRepo.signupUser(data, widget.token);
         _successfullSetup();
       } catch (error) {
         showDialog(

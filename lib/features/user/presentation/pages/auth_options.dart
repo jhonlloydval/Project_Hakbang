@@ -6,7 +6,6 @@ import 'package:hakbang/features/user/presentation/design/app_colors.dart';
 import 'package:hakbang/features/user/presentation/design/button_design.dart';
 import 'package:hakbang/features/user/presentation/design/font_styles.dart';
 import 'package:hakbang/features/user/presentation/design/input_design.dart';
-import 'package:hakbang/features/user/presentation/pages/signup_page.dart';
 import 'package:hakbang/features/user/presentation/pages/verification_timer.dart';
 import 'package:hakbang/functions/verifications.dart';
 
@@ -31,12 +30,14 @@ class _AuthOptionsState extends State<AuthOptions> {
             if (userDetails == null) {
               throw "No Email found";
             }
+            var data = await UserRepo.requestCode(userDetails["email"]);
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => SignupPage(
-                  authFullname: userDetails["fullname"],
-                  authemail: userDetails["email"],
+                builder: (context) => VerificationTimer(
+                  email: userDetails["email"],
+                  token: data["token"],
+                  fullname: userDetails["fullname"],
                 ),
               ),
             );
