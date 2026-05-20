@@ -63,7 +63,7 @@ dependencies:
   firebase_auth: ^6.5.1
   firebase_core: ^4.9.0
   flutter_countdown_timer: ^4.1.0
-  verification_code_field: ^1.2.4
+  pinput: ^6.0.2
 
 dev_dependencies:
   flutter_test:
