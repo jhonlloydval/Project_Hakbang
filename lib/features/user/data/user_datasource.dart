@@ -5,10 +5,40 @@ import 'package:hakbang/notifiers.dart';
 class UserDatasource {
   static final dio = Dio();
   static String mainUrl = "https://project-hakbang-server.onrender.com";
-  static Future<void> signupUserRouter(Map<String, dynamic> userData) async {
+  static Future<void> signupUserRouter(
+    Map<String, dynamic> userData,
+    String token,
+  ) async {
+    final headers = {"Authorization": "Bearer $token"};
     try {
       final data = userData["data"];
-      await dio.post("$mainUrl/user/signup", data: data);
+      await dio.post(
+        "$mainUrl/user/auth/signup",
+        data: data,
+        options: Options(headers: headers),
+      );
+    } on DioException catch (error) {
+      throw error.response?.data["message"];
+    }
+  }
+
+  static Future<Map<String, dynamic>> requestCodeRouter(String email) async {
+    try {
+      final response = await dio.post("$mainUrl/user/auth-user-email/$email");
+      return response.data;
+    } on DioException catch (error) {
+      throw error.response?.data["message"];
+    }
+  }
+
+  static Future<Map<String, dynamic>> verifyCodeRouter(
+    String token,
+    String code,
+  ) async {
+    try {
+      final data = {"token": token, "code": code};
+      final response = await dio.post("$mainUrl/user/verify", data: data);
+      return response.data;
     } on DioException catch (error) {
       throw error.response?.data["message"];
     }

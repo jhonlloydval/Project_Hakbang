@@ -20,7 +20,15 @@ import 'package:hakbang/features/user/presentation/widgets/signup_progress_indic
 import 'package:hakbang/features/user/presentation/widgets/auth_gradient_bg.dart';
 
 class SignupPage extends StatefulWidget {
-  const SignupPage({super.key});
+  final String token;
+  final String? authFullname;
+  final String authemail;
+  const SignupPage({
+    super.key,
+    required this.authFullname,
+    required this.authemail,
+    required this.token,
+  });
 
   @override
   State<SignupPage> createState() => _SignupPageState();
@@ -67,8 +75,8 @@ class _SignupPageState extends State<SignupPage> {
     _pageController = PageController();
 
     // Step 1 controllers
-    emailController = TextEditingController();
-    fullNameController = TextEditingController();
+    fullNameController = TextEditingController(text: widget.authFullname);
+    emailController = TextEditingController(text: widget.authemail);
     passwordController = TextEditingController();
     confirmPasswordController = TextEditingController();
 
@@ -183,9 +191,9 @@ class _SignupPageState extends State<SignupPage> {
           "about_me": "",
         },
       };
-
+      //TODO: Google Sign In
       try {
-        await UserRepo.signupUser(data);
+        await UserRepo.signupUser(data, widget.token);
         _successfullSetup();
       } catch (error) {
         showDialog(
@@ -227,259 +235,266 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: BackgroundDesign.startPageColor,
-      body: Stack(
-        children: [
-          const AuthGradientBg(),
-          SafeArea(
-            child: Column(
-              children: [
-                // Header with logo, HAKBANG text, and progress indicator
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            height: 45,
-                            width: 45,
-                            decoration: ContainerDesign.startImage,
-                            child: Image.asset(
-                              "assets/hakbang_logo.png",
-                              fit: BoxFit.cover,
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        backgroundColor: BackgroundDesign.startPageColor,
+        body: Stack(
+          children: [
+            const AuthGradientBg(),
+            SafeArea(
+              child: Column(
+                children: [
+                  // Header with logo, HAKBANG text, and progress indicator
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              height: 45,
+                              width: 45,
+                              decoration: ContainerDesign.startImage,
+                              child: Image.asset(
+                                "assets/hakbang_logo.png",
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Row(
-                            children: [
-                              Text(
-                                "HAK",
-                                style: FontStyles.mainHeadingLeft.copyWith(
-                                  fontSize: 24,
+                            const SizedBox(width: 12),
+                            Row(
+                              children: [
+                                Text(
+                                  "HAK",
+                                  style: FontStyles.mainHeadingLeft.copyWith(
+                                    fontSize: 24,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                "BANG",
-                                style: FontStyles.mainHeadingRight.copyWith(
-                                  fontSize: 24,
+                                Text(
+                                  "BANG",
+                                  style: FontStyles.mainHeadingRight.copyWith(
+                                    fontSize: 24,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      SignupProgressIndicator(
-                        currentStep: _currentStep,
-                        totalSteps: 3,
-                      ),
-                    ],
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        SignupProgressIndicator(
+                          currentStep: _currentStep,
+                          totalSteps: 3,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
 
-                // Page content
-                Expanded(
-                  child: PageView(
-                    controller: _pageController,
-                    physics:
-                        const NeverScrollableScrollPhysics(), // Disable swipe
-                    children: [
-                      SignupStep1(
-                        fullNameController: fullNameController,
-                        emailController: emailController,
-                        passwordController: passwordController,
-                        confirmPasswordController: confirmPasswordController,
-                        showPassword: showPassword,
-                        showConfirmPassword: showConfirmPassword,
-                        onPasswordVisibilityToggle: () {
-                          setState(() {
-                            showPassword = !showPassword;
-                          });
-                        },
-                        onConfirmPasswordVisibilityToggle: () {
-                          setState(() {
-                            showConfirmPassword = !showConfirmPassword;
-                          });
-                        },
-                        onContinue: () {
-                          if (!Verifications.verifyCredentials([
-                            fullNameController.text,
-                            emailController.text,
-                            passwordController.text,
-                            passwordController.text,
-                          ])) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                behavior: SnackBarBehavior.floating,
-                                content: Text("Required fields are not filled"),
-                              ),
-                            );
-                          } else if (!Verifications.checkPasswordLength(
-                            passwordController.text,
-                          )) {
-                            passwordController.clear();
-                            confirmPasswordController.clear();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                behavior: SnackBarBehavior.floating,
-                                content: Text(
-                                  "Password must be 8 characters long",
-                                ),
-                              ),
-                            );
-                          } else if (!Verifications.checkPasswordFormat(
-                            passwordController.text,
-                          )) {
-                            passwordController.clear();
-                            confirmPasswordController.clear();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                behavior: SnackBarBehavior.floating,
-                                content: Text(
-                                  "Password must contain upper case, lower case and numbers",
-                                ),
-                              ),
-                            );
-                          } else if (!Verifications.checkPasswordMatch(
-                            passwordController.text,
-                            confirmPasswordController.text,
-                          )) {
-                            passwordController.clear();
-                            confirmPasswordController.clear();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                behavior: SnackBarBehavior.floating,
-                                content: Text("Passwords do not match"),
-                              ),
-                            );
-                          } else {
-                            _nextStep();
-                          }
-                        },
-                        onSignIn: () {
-                          // Navigate to sign in
-                        },
-                      ),
-                      SignupStep2(
-                        selectedAvatarIndex: _selectedAvatarIndex,
-                        selectedOccupationIndex: _selectedOccupationIndex,
-                        schoolController: schoolController,
-                        gradeController: gradeController,
-                        avatars: avatars,
-                        occupations: occupations,
-                        onAvatarSelected: (index) {
-                          setState(() {
-                            _selectedAvatarIndex = index;
-                          });
-                        },
-                        onOccupationSelected: (index) {
-                          setState(() {
-                            _selectedOccupationIndex = index;
-                          });
-                        },
-                        onContinue: () {
-                          if (_selectedAvatarIndex == null ||
-                              _selectedOccupationIndex == null ||
-                              schoolController.text.trim().isEmpty ||
-                              gradeController.text.trim().isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                behavior: SnackBarBehavior.floating,
-                                content: Text("Required fields are not filled"),
-                              ),
-                            );
-                          } else {
-                            _nextStep();
-                          }
-                        },
-                        onBack: _previousStep,
-                      ),
-                      SignupStep3(
-                        selectedAvatarIndex: _selectedAvatarIndex,
-                        avatars: avatars,
-                        fullName: fullNameController.text,
-                        email: emailController.text,
-                        selectedOccupationIndex: _selectedOccupationIndex,
-                        occupations: occupations,
-                        grade: gradeController.text,
-                        onCreate: () {
-                          if (!Verifications.checkTerms()) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                behavior: SnackBarBehavior.floating,
-                                content: Text(
-                                  "Please check if you agree to the terms",
-                                ),
-                              ),
-                            );
-                          } else {
-                            _onSubmit();
-                          }
-                        },
-                        onBack: _previousStep,
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Divider(color: Color(0xFF2a2d38), thickness: 1),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Already have an account? ",
-                            style: FontStyles.memberSignIn,
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              try {
-                                await Locations.initializeLocationServices();
-                                userPosition.value =
-                                    await Locations.getUserLocation();
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => LoginPage(),
+                  // Page content
+                  Expanded(
+                    child: PageView(
+                      controller: _pageController,
+                      physics:
+                          const NeverScrollableScrollPhysics(), // Disable swipe
+                      children: [
+                        SignupStep1(
+                          fullNameController: fullNameController,
+                          emailController: emailController,
+                          passwordController: passwordController,
+                          confirmPasswordController: confirmPasswordController,
+                          showPassword: showPassword,
+                          showConfirmPassword: showConfirmPassword,
+                          onPasswordVisibilityToggle: () {
+                            setState(() {
+                              showPassword = !showPassword;
+                            });
+                          },
+                          onConfirmPasswordVisibilityToggle: () {
+                            setState(() {
+                              showConfirmPassword = !showConfirmPassword;
+                            });
+                          },
+                          onContinue: () {
+                            if (!Verifications.verifyCredentials([
+                              fullNameController.text,
+                              emailController.text,
+                              passwordController.text,
+                              passwordController.text,
+                            ])) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  content: Text(
+                                    "Required fields are not filled",
                                   ),
-                                );
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    behavior: SnackBarBehavior.floating,
-                                    content: Text(
-                                      'Location permission required to sign in',
-                                    ),
+                                ),
+                              );
+                            } else if (!Verifications.checkPasswordLength(
+                              passwordController.text,
+                            )) {
+                              passwordController.clear();
+                              confirmPasswordController.clear();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  content: Text(
+                                    "Password must be 8 characters long",
                                   ),
-                                );
-                              }
-                            },
-                            child: Text(
-                              "Sign In",
-                              style: FontStyles.highlightText,
+                                ),
+                              );
+                            } else if (!Verifications.checkPasswordFormat(
+                              passwordController.text,
+                            )) {
+                              passwordController.clear();
+                              confirmPasswordController.clear();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  content: Text(
+                                    "Password must contain upper case, lower case and numbers",
+                                  ),
+                                ),
+                              );
+                            } else if (!Verifications.checkPasswordMatch(
+                              passwordController.text,
+                              confirmPasswordController.text,
+                            )) {
+                              passwordController.clear();
+                              confirmPasswordController.clear();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  content: Text("Passwords do not match"),
+                                ),
+                              );
+                            } else {
+                              _nextStep();
+                            }
+                          },
+                          onSignIn: () {
+                            // Navigate to sign in
+                          },
+                        ),
+                        SignupStep2(
+                          selectedAvatarIndex: _selectedAvatarIndex,
+                          selectedOccupationIndex: _selectedOccupationIndex,
+                          schoolController: schoolController,
+                          gradeController: gradeController,
+                          avatars: avatars,
+                          occupations: occupations,
+                          onAvatarSelected: (index) {
+                            setState(() {
+                              _selectedAvatarIndex = index;
+                            });
+                          },
+                          onOccupationSelected: (index) {
+                            setState(() {
+                              _selectedOccupationIndex = index;
+                            });
+                          },
+                          onContinue: () {
+                            if (_selectedAvatarIndex == null ||
+                                _selectedOccupationIndex == null ||
+                                schoolController.text.trim().isEmpty ||
+                                gradeController.text.trim().isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  content: Text(
+                                    "Required fields are not filled",
+                                  ),
+                                ),
+                              );
+                            } else {
+                              _nextStep();
+                            }
+                          },
+                          onBack: _previousStep,
+                        ),
+                        SignupStep3(
+                          selectedAvatarIndex: _selectedAvatarIndex,
+                          avatars: avatars,
+                          fullName: fullNameController.text,
+                          email: emailController.text,
+                          selectedOccupationIndex: _selectedOccupationIndex,
+                          occupations: occupations,
+                          grade: gradeController.text,
+                          onCreate: () {
+                            if (!Verifications.checkTerms()) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  content: Text(
+                                    "Please check if you agree to the terms",
+                                  ),
+                                ),
+                              );
+                            } else {
+                              _onSubmit();
+                            }
+                          },
+                          onBack: _previousStep,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Divider(color: Color(0xFF2a2d38), thickness: 1),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Already have an account? ",
+                              style: FontStyles.memberSignIn,
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                            TextButton(
+                              onPressed: () async {
+                                try {
+                                  await Locations.initializeLocationServices();
+                                  userPosition.value =
+                                      await Locations.getUserLocation();
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => LoginPage(),
+                                    ),
+                                  );
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      behavior: SnackBarBehavior.floating,
+                                      content: Text(
+                                        'Location permission required to sign in',
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: Text(
+                                "Sign In",
+                                style: FontStyles.highlightText,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

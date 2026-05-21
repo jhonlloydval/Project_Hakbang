@@ -18,8 +18,6 @@ class SignupStep1 extends StatefulWidget {
 
   const SignupStep1({
     super.key,
-    required this.fullNameController,
-    required this.emailController,
     required this.passwordController,
     required this.confirmPasswordController,
     required this.showPassword,
@@ -28,6 +26,8 @@ class SignupStep1 extends StatefulWidget {
     required this.onConfirmPasswordVisibilityToggle,
     required this.onContinue,
     required this.onSignIn,
+    required this.fullNameController,
+    required this.emailController,
   });
 
   @override
@@ -36,6 +36,8 @@ class SignupStep1 extends StatefulWidget {
 
 class _SignupStep1State extends State<SignupStep1> {
   static const _iconColor = Color(0xFF828a8a);
+  late TextEditingController fullName = widget.fullNameController;
+  late TextEditingController email = widget.emailController;
 
   InputDecoration _getInputDecoration(String hintText) {
     return InputDesign.unfocusedInputDecoration(hintText);
@@ -67,10 +69,12 @@ class _SignupStep1State extends State<SignupStep1> {
     required String hintText,
     Widget? prefixIcon,
     Widget? suffixIcon,
+    bool isEmail = false,
     bool obscureText = false,
   }) {
     return TextField(
       controller: controller,
+      enabled: isEmail ? false : true,
       obscureText: obscureText,
       cursorColor: AppColors.accent,
       decoration: _getInputDecoration(hintText).copyWith(
@@ -125,15 +129,16 @@ class _SignupStep1State extends State<SignupStep1> {
             ),
             _buildInputLabel("FULL NAME"),
             _buildInputField(
-              controller: widget.fullNameController,
+              controller: fullName,
               hintText: 'Maria dela Cruz',
               prefixIcon: _buildEmojiPrefixContent('👤'),
             ),
             const SizedBox(height: 14),
             _buildInputLabel("EMAIL ADDRESS"),
             _buildInputField(
-              controller: widget.emailController,
+              controller: email,
               hintText: 'you@example.com',
+              isEmail: true,
               prefixIcon: _buildEmailPrefixIcon(),
             ),
             const SizedBox(height: 14),

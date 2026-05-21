@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hakbang/features/user/data/user_repo.dart';
 import 'package:hakbang/features/user/presentation/design/app_colors.dart';
 import 'package:hakbang/features/user/presentation/design/container_design.dart';
+import 'package:hakbang/features/user/presentation/pages/auth_options.dart';
 import 'package:hakbang/functions/initialization.dart';
 import 'package:hakbang/functions/internet.dart';
 import 'package:hakbang/functions/locations.dart';
@@ -10,7 +11,6 @@ import 'package:hakbang/features/user/data/models/user.dart';
 import 'package:hakbang/notifiers.dart';
 import 'package:hakbang/features/user/presentation/pages/main_page.dart';
 import 'package:hakbang/features/user/presentation/pages/no_internet_page.dart';
-import 'package:hakbang/features/user/presentation/pages/signup_page.dart';
 import 'package:hakbang/features/user/presentation/widgets/auth_gradient_bg.dart';
 
 class LoginPage extends StatefulWidget {
@@ -219,7 +219,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const SignupPage(),
+                                    builder: (context) => const AuthOptions(),
                                   ),
                                 );
                               },
