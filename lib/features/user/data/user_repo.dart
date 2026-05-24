@@ -3,9 +3,33 @@ import 'package:hakbang/features/user/data/user_datasource.dart';
 import 'package:hakbang/notifiers.dart';
 
 class UserRepo {
-  static Future<void> signupUser(Map<String, dynamic> userData) async {
+  static Future<void> signupUser(
+    Map<String, dynamic> userData,
+    String token,
+  ) async {
     try {
-      await UserDatasource.signupUserRouter(userData);
+      await UserDatasource.signupUserRouter(userData, token);
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  static Future<Map<String, dynamic>> requestCode(String email) async {
+    try {
+      var response = await UserDatasource.requestCodeRouter(email);
+      return response;
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  static Future<Map<String, dynamic>> verifyCode(
+    String token,
+    String code,
+  ) async {
+    try {
+      var response = await UserDatasource.verifyCodeRouter(token, code);
+      return response;
     } catch (error) {
       rethrow;
     }

@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hakbang/notifiers.dart';
 
 class Verifications {
@@ -39,5 +41,26 @@ class Verifications {
   static bool checkTerms() {
     if (!agreeToTerms.value) return false;
     return true;
+  }
+
+  static Future<Map<String, dynamic>?> authentication() async {
+    try {
+      final GoogleSignInAccount user = await GoogleSignIn.instance
+          .authenticate();
+
+      final GoogleSignInAuthentication auth = user.authentication;
+      final credential = GoogleAuthProvider.credential(idToken: auth.idToken);
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
+
+      final userData = userCredential.user;
+      if (userData == null) {
+        return null;
+      }
+      return {"email": userData.email, "fullname": userData.displayName};
+    } on GoogleSignInException {
+      throw "Session Canceled";
+    }
   }
 }

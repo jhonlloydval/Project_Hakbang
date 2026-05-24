@@ -14,7 +14,7 @@ class InputDesign {
     vertical: 13,
   );
 
-  static OutlineInputBorder _border({
+  static OutlineInputBorder borderInput({
     required Color color,
     required double width,
   }) {
@@ -36,9 +36,9 @@ class InputDesign {
       filled: true,
       fillColor: _fillColor,
       contentPadding: _contentPadding,
-      border: _border(color: _enabledBorderColor, width: 1.5),
-      enabledBorder: _border(color: _enabledBorderColor, width: 1.5),
-      focusedBorder: _border(color: _focusedBorderColor, width: 1.5),
+      border: borderInput(color: _enabledBorderColor, width: 1.5),
+      enabledBorder: borderInput(color: _enabledBorderColor, width: 1.5),
+      focusedBorder: borderInput(color: _focusedBorderColor, width: 1.5),
     );
   }
 }

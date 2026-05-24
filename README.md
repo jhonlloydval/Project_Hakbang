@@ -158,18 +158,25 @@ App Launch
 │     ├── Slide 3: Scholarship AI preview
 │     ├── Slide 4: Gabay AI preview
 │     └── Slide 5: Review Centers preview
-│           ├── [Get Started] → SignupPage
+│           ├── [Get Started] → AuthOptionsPage
 │           └── [Sign In]    → LoginPage
 │
+├── AuthOptionsPage (Authentication Options)
+│     ├── Manual Input method (email address)
+│     └── Google Popup sign-in method
+│ 
+├── VerificationTImerPage (3-step PageController flow)
+│     ├── Tokenize registration session
+│     └── OTP code email verification
+│ 
 ├── SignupPage (3-step PageController flow)
 │     ├── Step 1: Full name, email, password, confirm password
 │     ├── Step 2: Avatar, occupation, school name, grade level
-│     └── Step 3: Summary, T&C agreement → Database.createUser() → LoginPage
+│     └── Step 3: Summary, T&C agreement → UserRepo.signupUser() → LoginPage
 │
 ├── LoginPage
 │     ├── Internet check → NoInternetPage (if offline)
-│     ├── Database.userLogin() → JWT token stored in notifier
-│     ├── Database.getUserData() → userCredentials notifier populated
+│     ├── UserRepo.userLogin() → JWT token stored in notifier and initialize user data
 │     ├── Initialization.mainInitialization()
 │     │     ├── GPS position fetched → userPosition notifier
 │     │     ├── Activity log fetched → activityList notifier
@@ -196,8 +203,8 @@ App Launch
 | **Framework** | Flutter 3.x |
 | **Language** | Dart 3.11 |
 | **State Management** | `ValueNotifier` + `ValueListenableBuilder` (zero external state library) |
-| **Networking** | `http` package (REST API communication) |
-| **Authentication** | JWT Bearer Token (stored in-memory via `ValueNotifier`) |
+| **Networking** | `Dio` package (REST API communication) |
+| **Authentication/Authorization** | JWT Bearer Token (stored in-memory via `ValueNotifier`) and Firebase Google authentication |
 | **Maps** | OpenStreetMap via `flutter_map` + `flutter_osm_plugin` |
 | **Geolocation** | `geolocator` |
 | **Map Tile Caching** | `flutter_map_tile_caching` |
@@ -216,7 +223,8 @@ App Launch
 | **UI Utilities** | `dotted_border`, `marquee`, `flutter_svg` |
 | **App Icons** | `flutter_launcher_icons` |
 | **Backend Runtime** | Node.js (hosted on Render) |
-| **AI Service** | Separate AI backend (Render) |
+| **Backend Framework** | Express.js (hosted on Render) |
+| **AI Service** | Gemini AI API(model: gemini-2.5-flash) |
 
 ---
 
@@ -238,10 +246,15 @@ marquee: ^2.3.0
 faded_scrollable: ^1.0.1
 fading_edge_scrollview: ^4.1.1
 flutter_markdown_plus: ^1.0.7
+flutter_countdown_timer: ^4.1.0
+pinput: ^6.0.2
 
 # Networking & APIs
-http: ^1.6.0
+dio: ^5.9.2
 flutter_dotenv: ^6.0.0
+google_sign_in: ^7.2.0
+firebase_auth: ^6.5.1
+firebase_core: ^4.9.0
 
 # Maps & Geolocation
 flutter_map: ^8.2.2
@@ -278,6 +291,7 @@ This approach was deliberately chosen to keep the app lean, avoid dependency loc
 
 | Notifier | Type | Purpose |
 |---|---|---|
+| `connectedToServer` | `ValueNotifier<bool>` | Connection to server |
 | `userCredentials` | `ValueNotifier<User?>` | Logged-in user's profile data |
 | `token` | `ValueNotifier<String?>` | JWT bearer token for authenticated API calls |
 | `navigationBarIndex` | `ValueNotifier<int>` | Active bottom navigation tab (default: 2 — Home) |
@@ -361,20 +375,28 @@ description, iconName, date
 Hakbang communicates with two separate hosted backend services, both deployed on **Render**.
 
 ### Main API Server
-**Base URL:** `https://project-hakbang-server-vif8.onrender.com`
 
-| Method | HTTP | Endpoint | Description |
-|---|---|---|---|
-| `userLogin` | `POST` | `/user/login` | Authenticates credentials, returns JWT |
-| `createUser` | `POST` | `/user/register` | Creates a new user account |
-| `getUserData` | `GET` | `/user/...` | Fetches full user profile |
-| `getCollege` | `GET` | `/college/auth/available-colleges` | Returns full college directory |
-| `getScholarships` | `GET` | `/scholarship/auth/active-scholarships` | Returns all active scholarships |
-| `getHubs` | `GET` | *(hub endpoint)* | Returns review center list |
-| `getUserActivities` | `GET` | *(activity endpoint)* | Fetches user activity log |
-| `getSavedSchools` | `GET` | *(saved endpoint)* | Fetches user's saved colleges |
-| `getSavedScholarships` | `GET` | *(saved endpoint)* | Fetches user's saved scholarships |
-| `updateUserAboutMe` | `PATCH` | *(user endpoint)* | Updates user bio |
+| Method | HTTP | Description |
+|---|---|---|
+| `userLoginRouter` | `POST`| Authenticates credentials, returns JWT |
+| `signupUserRouter` | `POST` | Creates a new user account |
+| `requestCodeRouter` | `POST` | Requests an OTP code through email |
+| `verifyCodeRouter` | `POST` | verify token and OTP code |
+| `getCollegeRouter` | `GET` | Returns full college directory |
+| `getSavedSchoolRouter` | `GET` | Returns all the user's saved schools |
+| `saveSchoolRouter` | `POST` | save schools into log |
+| `removeSavedSchoolRouter` | `POST` | removes saved schools from log |
+| `getSavedScholarshipRouter` | `GET` | Returns all the user's saved scholarships |
+| `saveScholarshipRouter` | `POST` | save scholarships into log |
+| `removeSavedScholarshipRouter` | `POST` | removes saved scholarships from log |
+| `getScholarships` | `GET` | Returns all active scholarships |
+| `getHubsRouter` | `GET` | Returns review center list |
+| `getUserActivitiesRouter` | `GET` | Fetches user activity log |
+| `addActivityRouter` | `POST` | Adds an activity into log |
+| `removeActivityRouter` | `DELETE` | removes all the activity in log |
+| `getSavedSchools` | `GET` | Fetches user's saved colleges |
+| `getSavedScholarships` | `GET` | Fetches user's saved scholarships |
+| `updateUserAboutMe` | `PUT` | Updates user bio |
 
 All authenticated endpoints require:
 ```
@@ -382,11 +404,10 @@ Authorization: Bearer <token>
 ```
 
 ### AI Chat Service
-**Base URL:** `https://project-hakbang-server.onrender.com`
 
-| Method | HTTP | Endpoint | Description |
-|---|---|---|---|
-| `sendUsermessage` | `POST` | `/chat/auth/message` | Sends a user message and receives an AI response |
+| Method | HTTP | Description |
+|---|---|---|
+| `sendUsermessage` | `POST` | Sends a user message and receives an AI response |
 
 The AI chat service is handled by `lib/server/services/ai_chat.dart` and returns plain text responses that are rendered as Markdown in the UI via `flutter_markdown_plus`.
 
