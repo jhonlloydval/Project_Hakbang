@@ -20,6 +20,9 @@
 
 ## Table of Contents
 
+<details>
+<summary>Click to expand</summary>
+    
 1. [Background & Significance](#background--significance)
 2. [What is Hakbang?](#what-is-hakbang)
 3. [Target Users](#target-users)
@@ -35,6 +38,8 @@
 13. [Getting Started](#getting-started)
 14. [Environment Setup](#environment-setup)
 15. [Roadmap](#roadmap)
+
+</details>
 
 ---
 
