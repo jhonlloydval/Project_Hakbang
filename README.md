@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/hakbang_main_logo.png" alt="Hakbang Logo" width="120"/>
+<img src="assets/hakbang_main_logo1.png" alt="Hakbang Logo" width="120"/>
 
 # Hakbang
 
